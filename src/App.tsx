@@ -11,13 +11,31 @@ const Game = () => {
         setXIsNext(!xIsNext);
     }
 
+    const jumpTo = (nextMove: number) => {
+        // TODO
+    }
+
+    const moves: JSX.Element[] = history.map((squares, move) => {
+        let description: string;
+        if (move > 0) {
+            description = 'Go to move #' + move;
+        } else {
+            description = 'Go to game start';
+        }
+        return (
+            <li key={move}>
+                <button onClick={() => jumpTo(move)}>{description}</button>
+            </li>
+        );
+    });
+
     return (
         <div className="game">
             <div className="game-board">
                 <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay}/>
             </div>
             <div className="game-info">
-                <ol>{/*TODO*/}</ol>
+                <ol>{moves}</ol>
             </div>
         </div>
     );
@@ -25,7 +43,7 @@ const Game = () => {
 
 interface BoardProps {
     xIsNext: boolean,
-    squares: Array<string | null>,
+    squares: Array<string | null>, // == (string | null)[]
     onPlay: (nextSquares: Array<string | null>) => void
 }
 
