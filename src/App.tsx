@@ -1,14 +1,17 @@
 import React, {useState} from 'react';
 import './styles.css'
 
-const Board = () => {
+const Board = (): JSX.Element => {
     const [xIsNext, setXIsNext] = useState<boolean>(true);
     const [squares, setSquares] = useState<Array<string | null>>(Array(9).fill(null));
 
+    const winner: string | null = calculateWinner(squares);
+
     const handleClick = (i: number) => {
-        if (squares[i]) {
+        if (squares[i] || winner) {
             return;
         }
+
         const nextSquares: Array<string | null> = squares.slice();
         if (xIsNext) {
             nextSquares[i] = 'X';
@@ -19,8 +22,16 @@ const Board = () => {
         setXIsNext(!xIsNext);
     }
 
+    let status;
+    if (winner) {
+        status = 'Winner: ' + winner;
+    } else {
+        status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+    }
+
     return (
         <>
+            <div className="status">{status}</div>
             <div className="board-row">
                 <Square value={squares[0]} onSquareClick={() => handleClick(0)}/>
                 <Square value={squares[1]} onSquareClick={() => handleClick(1)}/>
@@ -45,8 +56,28 @@ interface SquareProps {
     onSquareClick: () => void;
 }
 
-const Square = ({value, onSquareClick}: SquareProps) => {
+const Square = ({value, onSquareClick}: SquareProps): JSX.Element => {
     return <button className="square" onClick={onSquareClick}>{value}</button>;
 };
+
+const calculateWinner = (squares: Array<string | null>): string | null => {
+    const lines: number[][] = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+    for (let i: number = 0; i < lines.length; i++) {
+        const [a, b, c]: number[] = lines[i];
+        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+            return squares[a];
+        }
+    }
+    return null;
+}
 
 export default Board;
