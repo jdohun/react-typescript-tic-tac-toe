@@ -2,12 +2,21 @@ import React, {useState} from 'react';
 import './styles.css'
 
 const Board = () => {
+    const [xIsNext, setXIsNext] = useState<boolean>(true);
     const [squares, setSquares] = useState<Array<string | null>>(Array(9).fill(null));
 
     const handleClick = (i: number) => {
+        if (squares[i]) {
+            return;
+        }
         const nextSquares: Array<string | null> = squares.slice();
-        nextSquares[i] = 'X';
+        if (xIsNext) {
+            nextSquares[i] = 'X';
+        } else {
+            nextSquares[i] = 'O';
+        }
         setSquares(nextSquares);
+        setXIsNext(!xIsNext);
     }
 
     return (
