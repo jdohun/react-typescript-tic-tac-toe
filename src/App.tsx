@@ -1,10 +1,35 @@
 import React, {useState} from 'react';
 import './styles.css'
 
-const Board = (): JSX.Element => {
+const Game = () => {
     const [xIsNext, setXIsNext] = useState<boolean>(true);
-    const [squares, setSquares] = useState<Array<string | null>>(Array(9).fill(null));
+    const [history, setHistory] = useState<Array<Array<string | null>>>([Array(9).fill(null)]);
+    const currentSquares = history[history.length - 1];
 
+    const handlePlay = (nextSquares: Array<string | null>) => {
+        setHistory([...history, nextSquares]);
+        setXIsNext(!xIsNext);
+    }
+
+    return (
+        <div className="game">
+            <div className="game-board">
+                <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay}/>
+            </div>
+            <div className="game-info">
+                <ol>{/*TODO*/}</ol>
+            </div>
+        </div>
+    );
+}
+
+interface BoardProps {
+    xIsNext: boolean,
+    squares: Array<string | null>,
+    onPlay: (nextSquares: Array<string | null>) => void
+}
+
+const Board = ({xIsNext, squares, onPlay}: BoardProps): JSX.Element => {
     const winner: string | null = calculateWinner(squares);
 
     const handleClick = (i: number) => {
@@ -18,8 +43,7 @@ const Board = (): JSX.Element => {
         } else {
             nextSquares[i] = 'O';
         }
-        setSquares(nextSquares);
-        setXIsNext(!xIsNext);
+        onPlay(nextSquares);
     }
 
     let status;
@@ -80,4 +104,4 @@ const calculateWinner = (squares: Array<string | null>): string | null => {
     return null;
 }
 
-export default Board;
+export default Game;
