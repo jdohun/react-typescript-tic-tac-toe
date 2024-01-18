@@ -4,15 +4,19 @@ import './styles.css'
 const Game = () => {
     const [xIsNext, setXIsNext] = useState<boolean>(true);
     const [history, setHistory] = useState<Array<Array<string | null>>>([Array(9).fill(null)]);
-    const currentSquares = history[history.length - 1];
+    const [currentMove, setCurrentMove] = useState<number>(0);
+    const currentSquares = history[currentMove];
 
     const handlePlay = (nextSquares: Array<string | null>) => {
-        setHistory([...history, nextSquares]);
+        const nextHistory: Array<Array<string | null>> = [...history.slice(0, currentMove + 1), nextSquares];
+        setHistory(nextHistory);
+        setCurrentMove(nextHistory.length - 1);
         setXIsNext(!xIsNext);
     }
 
     const jumpTo = (nextMove: number) => {
-        // TODO
+        setCurrentMove(nextMove);
+        setXIsNext(nextMove % 2 === 0);
     }
 
     const moves: JSX.Element[] = history.map((squares, move) => {
@@ -39,16 +43,22 @@ const Game = () => {
             </div>
         </div>
     );
-}
+};
 
 interface BoardProps {
-    xIsNext: boolean,
-    squares: Array<string | null>, // == (string | null)[]
-    onPlay: (nextSquares: Array<string | null>) => void
+    xIsNext: boolean;
+    squares: Array<string | null>; // == (string | null)[]
+    onPlay: (nextSquares: Array<string | null>) => void;
 }
 
 const Board = ({xIsNext, squares, onPlay}: BoardProps): JSX.Element => {
     const winner: string | null = calculateWinner(squares);
+    let status;
+    if (winner) {
+        status = 'Winner: ' + winner;
+    } else {
+        status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+    }
 
     const handleClick = (i: number) => {
         if (squares[i] || winner) {
@@ -64,14 +74,7 @@ const Board = ({xIsNext, squares, onPlay}: BoardProps): JSX.Element => {
         onPlay(nextSquares);
     }
 
-    let status;
-    if (winner) {
-        status = 'Winner: ' + winner;
-    } else {
-        status = 'Next player: ' + (xIsNext ? 'X' : 'O');
-    }
-
-    return (
+     return (
         <>
             <div className="status">{status}</div>
             <div className="board-row">
